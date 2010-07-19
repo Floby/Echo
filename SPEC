@@ -1,0 +1,2 @@
+******** END-TO-END COMMUNICATION ********
+A conversation between 2 clients happens using a single TCP socket.

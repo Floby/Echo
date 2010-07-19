@@ -1,0 +1,14 @@
+{
+    "Florent": {
+	"host": "localhost",
+	"port": 8001
+    },
+    "moi": {
+	"host": "localhost",
+	"port": 8002
+    },
+    "toi": {
+	"host": "localhost",
+	"port": 8003
+    }
+}
