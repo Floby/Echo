@@ -26,23 +26,8 @@ for(var bud in buds) {
     buds[bud].name = bud;
     buds[bud].__proto__ = require('./buds');
     buds[bud].echo = echo;
-    var socket = net.createConnection(buds[bud].port, buds[bud].host);
-    socket.buddy = buds[bud];
-    socket.buddyname = bud;
-    socket.setEncoding('utf8');
-    socket.addListener('connect', function() {
-	sys.puts("successfully connected to "+ this.buddyname);
-	this.removeListener('error', initial_on_error);
-	this.buddy.socket = this;
-	this.buddy.connectionState = 'connected';
-	this.buddy.authState = 'unsure';
-	this.write("[greetings] "+this.buddyname+"?\n");
-	this.buddy.setup();
-    });
-    socket.addListener('error', initial_on_error);
+    buds[bud].connect();
 }
-
-
 
 var stdin = process.openStdin();
 stdin.setEncoding('utf8');
@@ -53,7 +38,7 @@ stdin.addListener('data', function(data) {
 	var buddy = m[2];
 	var message = m[3];
 	try {
-	    echo.buddies[buddy].Write(message);
+	    echo.buddies[buddy].write(message);
 	} catch(e) {
 	    sys.puts(sys.inspect(e));
 	}
@@ -66,9 +51,8 @@ setInterval(function() {
     sys.puts(lb.length);
     var lost = lb[0];
     lb.shift();
-    sys.puts(sys.inspect(lost)+" is lost");
+    //sys.puts(sys.inspect(lost)+" is lost");
     searchBuddy(lost);
-    sys.puts(lb.length);
 }, 500);
 
 
@@ -78,7 +62,7 @@ function searchBuddy(buddy) {
 	var b = echo.buddies[bud];
 	if(b.connectionState == 'connected' && b.authState == 'verified') {
 	    sys.puts("asking "+b.name+" for "+buddy.name);
-	    b.AskFor(buddy);
+	    b.askFor(buddy);
 	    asked = true;
 	}
     }

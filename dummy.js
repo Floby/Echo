@@ -4,6 +4,7 @@ var sys = require('sys'),
     net = require('net');
 
 var sock;
+var port = parseInt(process.argv[2]);
 
 var cin = process.openStdin();
 cin.setEncoding('utf8');
@@ -22,4 +23,5 @@ net.createServer(function(socket) {
     });
     //socket.write("[message] how you're doing?\n");
     sock = socket;
-}).listen(8001);
+}).listen(port);
+sys.puts('listening on '+port);
