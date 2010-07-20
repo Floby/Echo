@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 
+/**
+ * A simple program that listens on a port and allows
+ * to write to the last connected socket
+ */
+
 var sys = require('sys'),
     net = require('net');
 
