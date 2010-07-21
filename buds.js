@@ -17,6 +17,10 @@ exports.parseMessage = function(message) {
     }
 }
 
+exports.h_greetings = function(content) {
+    this.socket.write("[my_name_is] "+this.name + "\n");
+};
+
 exports.h_my_name_is = function(content) {
     sys.puts(this.name+"'s name is "+content);
     if(this.name != content) {
@@ -33,6 +37,17 @@ exports.h_my_name_is = function(content) {
     }
 }
 
+exports.h_looking_for = function(content) {
+    if(content == this.name) {
+	this.socket.write("[insult] Looking for oneself is a really wise thing to do. but don't flood\n");
+    }
+    var b = this.echo.buddies[content];
+    if(!b) return;
+    if(b.connectionState == "connected" && b.authState == 'verified') {
+	this.socket.write('[buddy_info] ' + b.name + ' ' + b.host + ':' + b.port + "\n");
+    }
+};
+
 exports.h_buddy_info = function(content) {
     sys.puts(content);
     var regex = /^([a-zA-Z0-9_-]+) (.+)$/;
@@ -44,6 +59,7 @@ exports.h_buddy_info = function(content) {
     var contact = m[2].split(':');
     this.echo.buddies[m[1]].updateInfo(contact[0], parseInt(contact[1]));
 }
+
 
 exports.h_message = function(message) {
     sys.puts("received message from "+this.name+": "+message);
