@@ -101,9 +101,33 @@ exports.connect = function() {
 }
 
 exports.lost = function() {
-    this.socket.end();
+    if(this.socket) this.socket.end();
     this.connectionState = 'failed';
-    this.echo.lostBuddies.push(this);
+    this._searchInterval *= 2;
+    sys.puts("this._searchInterval = "+this._searchInterval);
+    this._nextSearchTimeout = setTimeout(function(o, m) {m.call(o)}, this._searchInterval, this, this.search);
+};
+
+exports._searchInterval = 500;
+
+exports.search = function() {
+    var asked = false;
+    for(var bud in this.echo.buddies) {
+	var b = this.echo.buddies[bud];
+	if(b.connectionState == 'connected' && b.authState == 'verified') {
+	    sys.puts("asking "+b.name+" for "+this.name);
+	    b.askFor(this);
+	    asked = true;
+	}
+    }
+    if(!asked) {
+	sys.puts("couldn't ask for "+this.name+"!");
+	this.lost();
+    }
+    else {
+	sys.puts("could ask for "+this.name+". expecting response within 10 seconds");
+	// TODO
+    }
 }
 
 exports.askFor = function(buddy) {
@@ -111,6 +135,7 @@ exports.askFor = function(buddy) {
 }
 
 exports.setup = function() {
+    if(this._nextSearchTimeout) clearTimeout(this._nextSearchTimeout);
     sys.puts("setting "+this.name+" up");
     this._buffer = "";
     this.socket.addListener('data', function(data) {

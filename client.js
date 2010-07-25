@@ -44,7 +44,7 @@ stdin.addListener('data', function(data) {
 	}
     }
 });
-
+/*
 setInterval(function() {
     if(echo.lostBuddies.length == 0) return;
     var lb = echo.lostBuddies;
@@ -54,7 +54,7 @@ setInterval(function() {
     //sys.puts(sys.inspect(lost)+" is lost");
     searchBuddy(lost);
 }, 500);
-
+*/
 
 function searchBuddy(buddy) {
     var asked = false;
