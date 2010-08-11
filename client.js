@@ -8,6 +8,7 @@ var sys = require('sys'),
 var local_port = 8000;
 var echo = {};
 echo.buddies = cfg.loadJsonSync("./buddies.json");
+echo.config = cfg.loadJsonSync('./config.json');
 echo.lostBuddies = [];
 
 sys.puts("initializing");
@@ -31,17 +32,23 @@ for(var bud in buds) {
 
 var stdin = process.openStdin();
 stdin.setEncoding('utf8');
-stdin.addListener('data', function(data) {
+sys.lines(stdin);
+stdin.addListener('line', function(data) {
+    sys.puts("received: "+ data);
     data = data.replace(/\n|\r/g, "");
     var m = data.match(/^(w) ([a-zA-Z_0-9-]+) (.*)$/);
-    if(m[1] == 'w') {
-	var buddy = m[2];
-	var message = m[3];
-	try {
-	    echo.buddies[buddy].write(message);
-	} catch(e) {
-	    sys.puts(sys.inspect(e));
+    try {
+	if(m[1] == 'w') {
+	    var buddy = m[2];
+	    var message = m[3];
+	    try {
+		echo.buddies[buddy].write(message);
+	    } catch(e) {
+		sys.puts(sys.inspect(e));
+	    }
 	}
+    } catch(e) {
+	sys.puts('invalid command');
     }
 });
 /*

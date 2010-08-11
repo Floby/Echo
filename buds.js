@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+
 var sys = require('sys');
 var net = require('net');
 
@@ -40,6 +41,7 @@ exports.h_my_name_is = function(content) {
 exports.h_looking_for = function(content) {
     if(content == this.name) {
 	this.socket.write("[insult] Looking for oneself is a really wise thing to do. but don't flood\n");
+	return;
     }
     var b = this.echo.buddies[content];
     if(!b) return;
@@ -101,9 +103,12 @@ exports.connect = function() {
 }
 
 exports.lost = function() {
+    var cfg = this.echo.config.buddyResearch;
     if(this.socket) this.socket.end();
     this.connectionState = 'failed';
-    this._searchInterval *= 2;
+    var si = this._searchInterval;
+    var si = (si * cfg.refreshIntervalMultiplier) < cfg.maxRefreshInterval ? si * cfg.refreshIntervalMultiplier : cfg.maxRefreshInterval;
+    this._searchInterval = si;
     sys.puts("this._searchInterval = "+this._searchInterval);
     this._nextSearchTimeout = setTimeout(function(o, m) {m.call(o)}, this._searchInterval, this, this.search);
 };

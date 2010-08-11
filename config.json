@@ -1,0 +1,7 @@
+{
+    "buddyResearch": {
+	"maxRefreshInterval": 60000,
+	"initialRefreshInterval": 500,
+	"refreshIntervalMultiplier": 1.5
+    }
+}
