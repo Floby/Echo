@@ -7,9 +7,16 @@ var sys = require('sys'),
 
 var local_port = 8000;
 var echo = {};
+process.on('uncaughtException', function(err) {
+    sys.puts(sys.inspect(err));
+});
 echo.buddies = cfg.loadJsonSync("./buddies.json");
 echo.config = cfg.loadJsonSync('./config.json');
 echo.lostBuddies = [];
+echo.insult = function() {
+    var i = Math.floor(Math.random() * this.config.insults.length);
+    return this.config.insults[i];
+}
 
 sys.puts("initializing");
 sys.puts("my buddies:\n"+sys.inspect(echo.buddies));
@@ -32,7 +39,8 @@ for(var bud in buds) {
 
 var stdin = process.openStdin();
 stdin.setEncoding('utf8');
-sys.lines(stdin);
+var interface = require('./interface').createInterface(echo, stdin, process.stdout);
+/*
 stdin.addListener('line', function(data) {
     sys.puts("received: "+ data);
     data = data.replace(/\n|\r/g, "");
@@ -51,30 +59,4 @@ stdin.addListener('line', function(data) {
 	sys.puts('invalid command');
     }
 });
-/*
-setInterval(function() {
-    if(echo.lostBuddies.length == 0) return;
-    var lb = echo.lostBuddies;
-    sys.puts(lb.length);
-    var lost = lb[0];
-    lb.shift();
-    //sys.puts(sys.inspect(lost)+" is lost");
-    searchBuddy(lost);
-}, 500);
-*/
-
-function searchBuddy(buddy) {
-    var asked = false;
-    for(var bud in echo.buddies) {
-	var b = echo.buddies[bud];
-	if(b.connectionState == 'connected' && b.authState == 'verified') {
-	    sys.puts("asking "+b.name+" for "+buddy.name);
-	    b.askFor(buddy);
-	    asked = true;
-	}
-    }
-    if(!asked) {
-	sys.puts("couldn't ask for "+buddy.name);
-	echo.lostBuddies.push(buddy);
-    }
-}
+ */

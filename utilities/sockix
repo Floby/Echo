@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+var sys = require('sys'),
+    net = require('net');
+
+var sockfile = process.argv[2];
+if(!sockfile) {
+    console.log("no socket specified");
+    process.exit(1);
+}
+var socket = net.createConnection(sockfile);
+socket.setEncoding('utf8');
+var stdin = process.openStdin();
+stdin.setEncoding('utf8');
+stdin.on('data', function(data) {
+    socket.write(data);
+});
+socket.on('data', function(data) {
+    sys.print(data);
+})

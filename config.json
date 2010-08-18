@@ -1,7 +1,22 @@
 {
+    "local_port": 8000,
     "buddyResearch": {
 	"maxRefreshInterval": 60000,
 	"initialRefreshInterval": 500,
 	"refreshIntervalMultiplier": 1.5
-    }
+    },
+    "me": {
+	"name": "Client"
+    },
+    "insults": [
+	"You prick",
+	"Motherfucker",
+	"Goof",
+	"Dumbass",
+	"Wanker",
+	"Asswipe",
+	"Fuckface",
+	"Dickhead",
+	"n00b"
+    ]
 }

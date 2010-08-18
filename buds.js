@@ -19,18 +19,16 @@ exports.parseMessage = function(message) {
 }
 
 exports.h_greetings = function(content) {
-    this.socket.write("[my_name_is] "+this.name + "\n");
+    this.socket.write("[my_name_is] "+this.echo.config.me.name + "\n");
 };
 
 exports.h_my_name_is = function(content) {
     sys.puts(this.name+"'s name is "+content);
     if(this.name != content) {
 	sys.puts("wrong number");
-	this.socket.end();
-	delete this.socket;
+	this.lost();
 	delete this.authState;
-	this.connectionState = 'wrong';
-	this.echo.lostBuddies.push(this);
+	//this.wrong();
     }
     else {
 	this.authState = 'verified';
@@ -40,7 +38,7 @@ exports.h_my_name_is = function(content) {
 
 exports.h_looking_for = function(content) {
     if(content == this.name) {
-	this.socket.write("[insult] Looking for oneself is a really wise thing to do. but don't flood\n");
+	this.socket.write("[insult] Looking for oneself is a really wise thing to do. but don't flood. " + this.echo.insult() + "\n");
 	return;
     }
     var b = this.echo.buddies[content];
@@ -62,9 +60,9 @@ exports.h_buddy_info = function(content) {
     this.echo.buddies[m[1]].updateInfo(contact[0], parseInt(contact[1]));
 }
 
-
 exports.h_message = function(message) {
     sys.puts("received message from "+this.name+": "+message);
+    this.emit('message', message);
 }
 
 exports.write = function(message) {
@@ -109,11 +107,18 @@ exports.lost = function() {
     var si = this._searchInterval;
     var si = (si * cfg.refreshIntervalMultiplier) < cfg.maxRefreshInterval ? si * cfg.refreshIntervalMultiplier : cfg.maxRefreshInterval;
     this._searchInterval = si;
-    sys.puts("this._searchInterval = "+this._searchInterval);
+    //sys.puts("this._searchInterval = "+this._searchInterval);
     this._nextSearchTimeout = setTimeout(function(o, m) {m.call(o)}, this._searchInterval, this, this.search);
 };
 
 exports._searchInterval = 500;
+
+exports.end = function() {
+    if(this.socket) {
+	this.socket.write("[bye] \n");
+	this.socket.end();
+    }
+}
 
 exports.search = function() {
     var asked = false;
@@ -126,7 +131,7 @@ exports.search = function() {
 	}
     }
     if(!asked) {
-	sys.puts("couldn't ask for "+this.name+"!");
+	//sys.puts("couldn't ask for "+this.name+"!");
 	this.lost();
     }
     else {
@@ -136,7 +141,7 @@ exports.search = function() {
 }
 
 exports.askFor = function(buddy) {
-    this.socket.write("[looking_for] "+buddy.name);
+    this.socket.write("[looking_for] "+buddy.name+"\n");
 }
 
 exports.setup = function() {
@@ -157,3 +162,4 @@ exports.setup = function() {
 	}
     });
 }
+exports.__proto__ = require('events').EventEmitter.prototype;
